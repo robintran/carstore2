@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/Fixtures.html
+
+one:
+  name: MyString
+  lft: 1
+  rgt: 1
+  depth: 1
+  link: MyString
+
+two:
+  name: MyString
+  lft: 1
+  rgt: 1
+  depth: 1
+  link: MyString
