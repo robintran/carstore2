@@ -74,6 +74,7 @@ task :fetch_database => :environment do
 
 end
 
+#check current cattegory have any children
 def have_children_tag(category_tag)
 	have_child = false
 	url = fetch_url(category_tag)
@@ -83,6 +84,8 @@ def have_children_tag(category_tag)
 	return have_child
 end
 
+#save a category into database
+#check if it has parent
 def save_category_into_database(category_tag, parent_category_tag)
 	name = fetch_text(category_tag)
 	parent_category = nil
@@ -104,31 +107,45 @@ def save_category_into_database(category_tag, parent_category_tag)
 	puts "***************"
 end
 
+#check a category tag is a child category tag or not
 def is_child_tag(category_tag, child_category_tags)
-	is_child = false
-	child_category_tags.each do |child_category_tag|
-		if fetch_text(child_category_tag) == fetch_text(category_tag)
-			is_child = true
-			break
+	if (category_tag!=nil)&&(child_category_tags!=nil)
+		is_child = false
+		child_category_tags.each do |child_category_tag|
+			if fetch_text(child_category_tag) == fetch_text(category_tag)
+				is_child = true
+				break
+			end
 		end
-	end
-	return is_child
+		return is_child
+	end	
 end
 
+#fetch name of category from tag
 def fetch_text(item)
-	return item.at_css("a").text
+	if item
+		return item.at_css("a").text
+	end	
 end
 
+#fetch all child category tags from a website
 def fetch_child_category_tags(url)
-	doc = Nokogiri::HTML(open(url))
-	return doc.css(".active .js-show .js-show")
+	if url
+		doc = Nokogiri::HTML(open(url))
+		return doc.css(".active .js-show .js-show")
+	end	
 end
 
+#fetch all category tags from a website
 def fetch_category_tags(url)
-	doc = Nokogiri::HTML(open(url))
-	return doc.css("#category-tree .active .js-show")
+	if url
+		doc = Nokogiri::HTML(open(url))
+		return doc.css("#category-tree .active .js-show")	
+	end	
 end
 
+#fetch url from a category tag
+#that will redirect to show it's products and it's children categories
 def fetch_url(item)
 	if !item
 		return "http://www.gumtree.com/all/london"

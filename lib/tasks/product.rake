@@ -4,19 +4,25 @@ task :fetch_products => :environment do
 	require 'open-uri'
 	require 'cgi'
 
-	@product_array = Array.new
+	#******************************
+	#product at here is only a string not an object
+	#product_array is an array which contain strings not objects
+	#category at here is an object
+	#******************************
 
-	categories = Category.where(:depth => 0)
+	@product_array = Array.new
 	
-	categories.each do |category|
+	Category.all.each do |category|
 
 		url = category.link
 		products = fetch_products(url)
 
+		#save product at the first time because it's link is different from the second and others
 		save_products_into_database(products, category, @product_array)
 
 		number_of_page = fetch_number_page(url)
 
+		#save product from the second time and further, theirs links are same structure
 		(2 .. number_of_page).each do |number|
 			url = "http://www.gumtree.com/flats-and-houses-for-rent/london/page" + number.to_s
 			products = fetch_products(url)
@@ -25,17 +31,23 @@ task :fetch_products => :environment do
 	end	
 end
 
+#count the number of prouct page of a category
 def fetch_number_page(url)
-	number_text = ""
-	doc = Nokogiri::HTML(open(url))
-	doc.css("#pagination a").each do |button|
-		if (button.text != "Previous")&&(button.text != "Next")
-			number_text = button.text
-		end		
-	end
-	return Integer(number_text)
+	if url
+		number_text = ""
+		doc = Nokogiri::HTML(open(url))
+		doc.css("#pagination a").each do |button|
+			if (button.text != "Previous")&&(button.text != "Next")
+				number_text = button.text
+			end		
+		end
+		return Integer(number_text)
+	end	
 end
 
+#save products of a category into database
+#check if there are any same products, just add relationship between category and product
+#not add new product
 def save_products_into_database(products, category, product_array)
 	products.each do |product|
 		flag = false
@@ -75,21 +87,27 @@ def save_products_into_database(products, category, product_array)
 	end		
 end
 
+#fetch product-tags from an url of a page
 def fetch_products(url)
-	doc = Nokogiri::HTML(open(url))
-	return doc.css(".offer-sale")
+	if url
+		doc = Nokogiri::HTML(open(url))
+		return doc.css(".offer-sale")
+	end	
 end
 
+#fetch the name a product
 def fetch_text(item)
 	if item
 		return item.at_css(".ad-title-text").text
 	end	
 end
+#fetch the link in the product-tag that contains product id
 def fetch_link(product)
 	if product
 		return product.at_css("a").attributes["href"].value
 	end	
 end
+#fetch product id from the product tag
 def fetch_id(product)
 	if product
 		link = fetch_link(product)
