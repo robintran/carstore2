@@ -7,6 +7,6 @@ class Category < ActiveRecord::Base
 	validates :link, :presence => true
 
 	def self.next(category)
-		Category.find(:first, :order => 'id ASC', :conditions => ["id > ?", category.id])
+		self.find(:first, :order => 'id ASC', :conditions => ["id > ?", category.id])
 	end
 end

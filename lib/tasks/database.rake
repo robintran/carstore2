@@ -49,10 +49,10 @@ task :fetch_database => :environment do
 
 			#check
 			puts "***************"
-			puts ">>>>> Current Category: " + current_category.name
+			puts ">>>>> Current Category: " + current_category.name unless !current_category
 			puts "***************"	
 		end
-		
+
 		#check
 		puts "***************"
 		puts ">>>>> Final Current Category: " + current_category.name
