@@ -86,6 +86,7 @@ end
 def save_category_into_database(category_tag, parent_category_tag)
 	name = fetch_text(category_tag)
 	parent_category = nil
+	link = fetch_url(category_tag)
 
 	if parent_category_tag
 		parent_category_name = fetch_text(parent_category_tag)
@@ -94,7 +95,8 @@ def save_category_into_database(category_tag, parent_category_tag)
 
 	Category.create(
 		:name => name,
-		:parent => parent_category		
+		:parent => parent_category,
+		:link => link		
 		)
 	#check
 	puts "***************"
