@@ -6,6 +6,7 @@ one:
   rgt: 1
   depth: 1
   link: MyString
+  parent_id: 1
 
 two:
   name: MyString
@@ -13,3 +14,4 @@ two:
   rgt: 1
   depth: 1
   link: MyString
+  parent_id: 1

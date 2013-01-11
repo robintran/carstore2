@@ -21,24 +21,38 @@ task :fetch_database => :environment do
 			end
 		end
 
+		#check
+		puts "***************"
+		puts ">>>>> Current Category before if : " + current_category.name unless !current_category
+		puts "***************"	
+
 		if current_category
-			current_category = Category.find_by_id(current_category.id + 1)
+			current_category = Category.next(current_category)
 			break unless current_category
 		else
 			current_category = Category.first unless current_category
-		end		
+		end
+
+		#check
+		puts "***************"
+		puts ">>>>> Current Category after if : " + current_category.name
+		puts "***************"		
 
 		while check_number_tag(current_category.link) == 0
 			#check
 			puts "***************"
 			puts ">>>>> Need to change Category: " + current_category.name
-			current_category = Category.find_by_id(current_category.id + 1)
+			puts "***************"	
+
+			current_category = Category.next(current_category)
 			finish = true unless current_category
+
 			#check
 			puts "***************"
 			puts ">>>>> Current Category: " + current_category.name
 			puts "***************"	
 		end
+		
 		#check
 		puts "***************"
 		puts ">>>>> Final Current Category: " + current_category.name
