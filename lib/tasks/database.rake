@@ -5,95 +5,65 @@ task :fetch_database => :environment do
 	require 'cgi'
 
 	finish = false
-	current_category_tag = nil # is a string
-	category_tags_array = Array.new
-	category_tag_flag = -1
+	current_category = nil
+	url = "http://www.gumtree.com/all/london"
 
-	while !finish
-		url = fetch_url(current_category_tag)
+	while !finish	
+
+		url = current_category.link unless !current_category
 		category_tags = fetch_category_tags(url)
 		child_category_tags = fetch_child_category_tags(url)
 
 		#save categories into database
 		category_tags.each do |category_tag|
 			if (!is_child_tag(category_tag, child_category_tags)) && (fetch_text(category_tag) != "See full list") 
-				save_category_into_database(category_tag, current_category_tag)
-
-				#save category tags into array
-				category_tag_flag += 1
-				category_tags_array[category_tag_flag] = category_tag
-
-				#check
-				puts "***************"
-				puts "Category tags array has an item " + category_tag_flag.to_s + " - " + fetch_text(category_tag)
-				puts "***************"
-			end	
+				save_category_into_database(category_tag, current_category)
+			end
 		end
 
-		#check category tags array is empty?
-		if category_tag_flag == -1
-			finish = true
-		end
+		if current_category
+			current_category = Category.find_by_id(current_category.id + 1)
+			break unless current_category
+		else
+			current_category = Category.first unless current_category
+		end		
 
-		#check
-		puts "***************"
-		puts "Finish is " + finish.to_s
-		puts "***************"
-
-		#update current parent
-		check_flag = true
-		while check_flag
-			if category_tag_flag == -1
-				finish = true
-				check_flag = false
-			end
-
-			last_category_tag = category_tags_array.pop
-			category_tag_flag = category_tag_flag - 1
-
-			if have_children_tag(last_category_tag)
-				current_category_tag = last_category_tag
-				#check
-				puts "***************"
-				puts fetch_text(current_category_tag)
-				puts "***************"
-				check_flag = false				
-			end
-
+		while check_number_tag(current_category.link) == 0
 			#check
 			puts "***************"
-			puts "Finish " + finish.to_s
-			puts "check_flag" + check_flag.to_s
+			puts ">>>>> Need to change Category: " + current_category.name
+			current_category = Category.find_by_id(current_category.id + 1)
+			finish = true unless current_category
+			#check
 			puts "***************"
-
+			puts ">>>>> Current Category: " + current_category.name
+			puts "***************"	
 		end
+		#check
+		puts "***************"
+		puts ">>>>> Final Current Category: " + current_category.name
+		puts "***************"		
 
-		#exist while loop
 		# finish = true
 	end
 
 end
 
-private
-#check current cattegory have any children
-def have_children_tag(category_tag)
-	have_child = false
-	url = fetch_url(category_tag)
-	have_child = true unless !fetch_child_category_tags(url)
-	return have_child
+def check_number_tag(url)
+	category_tags = fetch_category_tags(url)
+	#check
+	puts "***************"
+	puts ">>>>> Number of category tag: " + category_tags.count.to_s
+	puts "***************"	
+
+	return category_tags.count
 end
 
 #save a category into database
 #check if it has parent
-def save_category_into_database(category_tag, parent_category_tag)
+def save_category_into_database(category_tag, parent_category)
 	name = fetch_text(category_tag)
-	parent_category = nil
 	link = fetch_url(category_tag)
-
-	if parent_category_tag
-		parent_category_name = fetch_text(parent_category_tag)
-		parent_category = Category.find_by_name(parent_category_name)	
-	end	
 
 	Category.create(
 		:name => name,
