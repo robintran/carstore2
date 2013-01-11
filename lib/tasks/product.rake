@@ -14,9 +14,15 @@ task :fetch_products => :environment do
 
 		url = category.link
 		products = fetch_products(url)
-
-		#save product at the first time because it's link is different from the second and others
-		save_products_into_database(products, category)
+		products.each do |product|
+			name = fetch_text(product)
+			fetched_id = fetch_id(product)
+			Product.create_from_category(category, fetched_id, name)
+			#check
+			puts "***************"
+			puts "Product " + name + " is saved successfully"
+			puts "***************"	
+		end
 
 
 		number_of_page = fetch_number_page(url)
@@ -26,7 +32,17 @@ task :fetch_products => :environment do
 			(2 .. number_of_page).each do |number|
 				url = "http://www.gumtree.com/flats-and-houses-for-rent/london/page" + number.to_s
 				products = fetch_products(url)
-				save_products_into_database(products, category)
+
+				products.each do |product|
+					#save product
+					name = fetch_text(product)
+					fetched_id = fetch_id(product)
+					Product.create_from_category(category, fetched_id, name)
+					#check
+					puts "***************"
+					puts "Product " + name + " is saved successfully"
+					puts "***************"	
+				end				
 			end	
 		end
 	end	
@@ -48,21 +64,6 @@ def fetch_number_page(url)
 	end	
 end
 
-#save products of a category into database
-def save_products_into_database(products, category)
-	products.each do |product|
-		name = fetch_text(product)
-		id = fetch_id(product)
-		products.each do |product|
-			product.create_from_category(category, id, name)
-		end
-		#check
-		puts "***************"
-		puts "Product " + name + " is saved successfully"
-		puts "***************"	
-	end	
-end
-
 #fetch product-tags from an url of a page
 def fetch_products(url)
 	if url
@@ -73,15 +74,11 @@ end
 
 #fetch the name a product
 def fetch_text(item)
-	if item
-		return item.at_css(".ad-title-text").text
-	end	
+	return item.at_css(".ad-title-text").text unless !item
 end
 #fetch the link in the product-tag that contains product id
 def fetch_link(product)
-	if product
-		return product.at_css("a").attributes["href"].value
-	end	
+	return product.at_css("a").attributes["href"].value unless !product
 end
 #fetch product id from the product tag
 def fetch_id(product)

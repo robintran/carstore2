@@ -78,9 +78,7 @@ end
 def have_children_tag(category_tag)
 	have_child = false
 	url = fetch_url(category_tag)
-	if fetch_category_tags(url)
-		have_child = true
-	end
+	have_child = true unless !fetch_child_category_tags(url)
 	return have_child
 end
 
@@ -123,9 +121,7 @@ end
 
 #fetch name of category from tag
 def fetch_text(item)
-	if item
-		return item.at_css("a").text
-	end	
+	return item.at_css("a").text unless !item
 end
 
 #fetch all child category tags from a website

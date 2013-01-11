@@ -1,14 +1,15 @@
 class Product < ActiveRecord::Base
 	has_and_belongs_to_many :categories, :join_table => "categories_products"
-  attr_accessible :name, :id
+  attr_accessible :name, :fetched_id
   validates :name, :presence => true
-  validates :id, :presence => true, :uniqueness => true
+  validates :fetched_id, :presence => true, :uniqueness => true
 
-  def self.create_from_category(category, id, name)
+  private
+  def self.create_from_category(category, fetched_id, name)
   	category.products.create(
-  		:id => id,
+  		:fetched_id => fetched_id,
   		:name => name
-  		) unless Product.exists?(:id => id)
+  		) unless Product.exists?(:fetched_id => fetched_id)
   end
 end
 

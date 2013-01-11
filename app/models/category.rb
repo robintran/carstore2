@@ -3,4 +3,5 @@ class Category < ActiveRecord::Base
 	acts_as_nested_set
   attr_accessible :depth, :lft, :link, :name, :rgt, :parent
   validates :name, :presence => true, :uniqueness => true
+  validates :link, :presence => true
 end
