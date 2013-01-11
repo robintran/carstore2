@@ -15,7 +15,7 @@ task :fetch_products => :environment do
 		url = category.link
 		products = fetch_products(url)
 		products.each do |product|
-			name = fetch_text(product)
+			name = fetch_name(product)
 			fetched_id = fetch_id(product)
 			Product.create_from_category(category, fetched_id, name)
 			#check
@@ -35,7 +35,7 @@ task :fetch_products => :environment do
 
 				products.each do |product|
 					#save product
-					name = fetch_text(product)
+					name = fetch_name(product)
 					fetched_id = fetch_id(product)
 					Product.create_from_category(category, fetched_id, name)
 					#check
@@ -48,6 +48,7 @@ task :fetch_products => :environment do
 	end	
 end
 
+private
 #count the number of prouct page of a category
 def fetch_number_page(url)
 	if url
@@ -72,8 +73,9 @@ def fetch_products(url)
 	end	
 end
 
+
 #fetch the name a product
-def fetch_text(item)
+def fetch_name(item)
 	return item.at_css(".ad-title-text").text unless !item
 end
 #fetch the link in the product-tag that contains product id
@@ -85,7 +87,7 @@ def fetch_id(product)
 	if product
 		#check
 		puts "***************"
-		puts "Before fetch_id of product " + fetch_text(product)
+		puts "Before fetch_id of product " + fetch_name(product)
 		puts "Link of product " + fetch_link(product)
 		puts "***************"
 

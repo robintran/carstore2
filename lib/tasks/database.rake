@@ -74,6 +74,7 @@ task :fetch_database => :environment do
 
 end
 
+private
 #check current cattegory have any children
 def have_children_tag(category_tag)
 	have_child = false
