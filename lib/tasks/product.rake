@@ -23,10 +23,12 @@ task :fetch_products => :environment do
 		number_of_page = fetch_number_page(url)
 
 		#save product from the second time and further, theirs links are same structure
-		(2 .. number_of_page).each do |number|
-			url = "http://www.gumtree.com/flats-and-houses-for-rent/london/page" + number.to_s
-			products = fetch_products(url)
-			save_products_into_database(products,category, @product_array)
+		if (number_of_page != nil) && (number_of_page >= 2)
+			(2 .. number_of_page).each do |number|
+				url = "http://www.gumtree.com/flats-and-houses-for-rent/london/page" + number.to_s
+				products = fetch_products(url)
+				save_products_into_database(products,category, @product_array)
+			end	
 		end
 	end	
 end
@@ -41,7 +43,9 @@ def fetch_number_page(url)
 				number_text = button.text
 			end		
 		end
-		return Integer(number_text)
+		if number_text!=""
+			return number_text.to_i
+		end		
 	end	
 end
 
@@ -110,9 +114,15 @@ end
 #fetch product id from the product tag
 def fetch_id(product)
 	if product
+		#check
+		puts "***************"
+		puts "Before fetch_id of product " + fetch_text(product)
+		puts "Link of product " + fetch_link(product)
+		puts "***************"
+
 		link = fetch_link(product)
 		number = link.split('/').pop
-		return Integer(number)		
+		return number.to_i		
 	end
 	
 end
