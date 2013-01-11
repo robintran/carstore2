@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130111023802) do
+ActiveRecord::Schema.define(:version => 20130111044211) do
 
   create_table "categories", :force => true do |t|
     t.string   "name"
@@ -24,7 +24,7 @@ ActiveRecord::Schema.define(:version => 20130111023802) do
     t.integer  "parent_id"
   end
 
-  create_table "categories_products", :force => true do |t|
+  create_table "categories_products", :id => false, :force => true do |t|
     t.integer "category_id"
     t.integer "product_id"
   end

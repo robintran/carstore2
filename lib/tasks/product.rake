@@ -9,8 +9,6 @@ task :fetch_products => :environment do
 	#product_array is an array which contain strings not objects
 	#category at here is an object
 	#******************************
-
-	@product_array = Array.new
 	
 	Category.all.each do |category|
 
@@ -18,7 +16,8 @@ task :fetch_products => :environment do
 		products = fetch_products(url)
 
 		#save product at the first time because it's link is different from the second and others
-		save_products_into_database(products, category, @product_array)
+		save_products_into_database(products, category)
+
 
 		number_of_page = fetch_number_page(url)
 
@@ -27,7 +26,7 @@ task :fetch_products => :environment do
 			(2 .. number_of_page).each do |number|
 				url = "http://www.gumtree.com/flats-and-houses-for-rent/london/page" + number.to_s
 				products = fetch_products(url)
-				save_products_into_database(products,category, @product_array)
+				save_products_into_database(products, category)
 			end	
 		end
 	end	
@@ -50,45 +49,18 @@ def fetch_number_page(url)
 end
 
 #save products of a category into database
-#check if there are any same products, just add relationship between category and product
-#not add new product
-def save_products_into_database(products, category, product_array)
+def save_products_into_database(products, category)
 	products.each do |product|
-		flag = false
-		product_array.each do |item|
-			if fetch_id(item) == fetch_id(product)
-				flag = true
-				break
-			end
+		name = fetch_text(product)
+		id = fetch_id(product)
+		products.each do |product|
+			product.create_from_category(category, id, name)
 		end
-		if flag
-			number = fetch_id(product)
-			product = Product.find_by_id(number)
-			CategoriesProducts.create(
-				:product => product,
-				:category => category
-				)
-
-			#check
-			puts "***************"
-			puts "Relationship between Category " + category.id.to_s + " Product " + product.id.to_s + " is saved successfully"
-			puts "***************"
-		else
-			name = fetch_text(product)
-			number = fetch_id(product)
-			category.products.create(
-				:id => number,
-				:name => name
-				)
-
-			#check
-			puts "***************"
-			puts "Product " + name + " is saved successfully"
-			puts "***************"
-
-			product_array[product_array.count] = product
-		end		
-	end		
+		#check
+		puts "***************"
+		puts "Product " + name + " is saved successfully"
+		puts "***************"	
+	end	
 end
 
 #fetch product-tags from an url of a page
