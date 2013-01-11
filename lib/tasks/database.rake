@@ -55,7 +55,7 @@ task :fetch_database => :environment do
 
 		#check
 		puts "***************"
-		puts ">>>>> Final Current Category: " + current_category.name
+		puts ">>>>> Final Current Category: " + current_category.name unless !current_category
 		puts "***************"		
 
 		# finish = true
